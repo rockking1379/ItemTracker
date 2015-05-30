@@ -42,7 +42,7 @@ public class Loan
 
     public String getLoanDuration()
     {
-        if(Long.valueOf(checkIn) != null)
+        if (Long.valueOf(checkIn) != null)
         {
             Date duration = new Date(checkIn - checkOut);
             DateFormat format = new SimpleDateFormat("DD:HH:mm");
@@ -57,13 +57,17 @@ public class Loan
         }
     }
 
-    public long getCheckOut()
+    public String getCheckOut()
     {
-        return checkOut;
+        Date d = new Date(checkOut);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return format.format(d);
     }
 
-    public long getCheckIn()
+    public String getCheckIn()
     {
-        return checkIn;
+        Date d = new Date(checkIn);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return format.format(d);
     }
 }

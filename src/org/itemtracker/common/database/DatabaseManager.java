@@ -16,12 +16,14 @@ public interface DatabaseManager
 {
     /**
      * Makes Connection to Database
+     *
      * @return new Connection to Database
      */
     Connection connect();
 
     /**
      * Closes Connection to Database
+     *
      * @param connection Connection to be closed
      */
     void disconnect(Connection connection);
@@ -114,6 +116,13 @@ public interface DatabaseManager
      * @return SQL Code execution
      */
     boolean removeLoanee(Loanee loanee);
+
+    /**
+     * Changes information about a loanee based on loanee_id
+     * @param loanee Loanee to be updated
+     * @return SQL Code exception
+     */
+    boolean updateLoanee(Loanee loanee);
 
     /**
      * Gets specific Loanee

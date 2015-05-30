@@ -5,14 +5,13 @@ import org.itemtracker.common.objects.Loanable;
 import org.itemtracker.common.objects.Loanee;
 
 import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Implements Database Manager
+ * <br>
  * Specific for SQLite
  * Created by james on 5/29/15.
  */
@@ -38,7 +37,7 @@ public class SQLiteManager implements DatabaseManager
         catch (ClassNotFoundException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -49,7 +48,7 @@ public class SQLiteManager implements DatabaseManager
         {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dbLocation);
 
-            if(connection != null)
+            if (connection != null)
             {
                 return connection;
             }
@@ -61,7 +60,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -78,7 +77,7 @@ public class SQLiteManager implements DatabaseManager
             catch (SQLException e)
             {
                 //set up logger
-                System.err.println(e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -100,7 +99,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
         finally
@@ -125,7 +124,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
         finally
@@ -149,7 +148,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -175,7 +174,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -205,16 +204,18 @@ public class SQLiteManager implements DatabaseManager
                     loanable = new Loanable(loanableResultSet.getInt("loanable_id"), loanableResultSet.getString("loanable_name"), loanableResultSet.getString("loanable_barcode"));
                 }
 
-                pStmnt = connection.prepareStatement("SELECT * FROM Loanees WHERE loanee_id=? AND Loanees.loanee_active=1");
+                pStmnt = connection.prepareStatement("SELECT * FROM Loanees WHERE loanee_id=? AND loanee_active=1");
+
+                pStmnt.setInt(1, loanResultSet.getInt("loanee_id"));
 
                 ResultSet loaneeResultSet = pStmnt.executeQuery();
 
-                while (loanableResultSet.next())
+                while (loaneeResultSet.next())
                 {
                     loanee = new Loanee(loaneeResultSet.getInt("loanee_id"), loaneeResultSet.getString("loanee_first_name"), loaneeResultSet.getString("loanee_last_name"), loaneeResultSet.getString("loanee_barcode"), loaneeResultSet.getString("loanee_email"));
                 }
 
-                result.add(new Loan(loanResultSet.getInt("loan_id"), loanable, loanee, loanResultSet.getString("check_out")));
+                result.add(new Loan(loanResultSet.getInt("loan_id"), loanable, loanee, loanResultSet.getLong("check_out"), loanResultSet.getLong("check_in")));
             }
 
             return result;
@@ -222,7 +223,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
@@ -243,7 +244,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
         finally
@@ -267,7 +268,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
         finally
@@ -298,7 +299,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -329,7 +330,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -360,7 +361,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -387,7 +388,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
         finally
@@ -412,7 +413,36 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        finally
+        {
+            disconnect(connection);
+        }
+    }
+
+    @Override
+    public boolean updateLoanee(Loanee loanee)
+    {
+        Connection connection = connect();
+        try
+        {
+            PreparedStatement stmnt = connection.prepareStatement("UPDATE Loanees SET loanee_first_name=?, loanee_last_name=?, loanee_barcode=?, loanee_email=? WHERE loanee_id=?");
+
+            stmnt.setString(1, loanee.getFirstName());
+            stmnt.setString(2, loanee.getLastName());
+            stmnt.setString(3, loanee.getBarcodeId());
+            stmnt.setString(4, loanee.getEmailAddress());
+            stmnt.setInt(5, loanee.getLoaneeId());
+
+            return stmnt.executeUpdate() > 0;
+
+        }
+        catch(SQLException e)
+        {
+            //setup logger
+            e.printStackTrace();
             return false;
         }
         finally
@@ -445,7 +475,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -478,7 +508,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -509,7 +539,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             return null;
         }
         finally
@@ -540,7 +570,7 @@ public class SQLiteManager implements DatabaseManager
         catch (SQLException e)
         {
             //set up logger
-            System.err.println(e.getMessage());
+            e.printStackTrace();
             retVal = false; //shit went south, return false
         }
         finally
