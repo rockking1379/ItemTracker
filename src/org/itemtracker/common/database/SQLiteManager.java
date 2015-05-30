@@ -23,7 +23,7 @@ public class SQLiteManager implements DatabaseManager
     private static final String LOANEEDROP = "DROP TABLE IF EXISTS Loanees";
     private static final String LOANEECREATE = "CREATE TABLE Loanees(loanee_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanee_first_name VARCHAR(50) NOT NULL, loanee_last_name VARCHAR(50) NOT NULL, loanee_email VARCHAR(75), loanee_barcode VARCHAR(50) NOT NULL, loanee_active BOOLEAN NOT NULL)";
     private static final String LOANABLECREATE = "CREATE TABLE Loanables(loanable_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_name VARCHAR(50) NOT NULL, loanable_barcode VARCHAR(50) NOT NULL, loanable_active BOOLEAN NOT NULL)";
-    private static final String LOANCREATE = "CREATE TABLE Loans(loan_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_id INTEGER, loanee_id INTEGER, check_out DATE NOT NULL, check_in DATE, FOREIGN KEY(loanable_id) REFERENCES Loanables(loanable_id), FOREIGN KEY(loanee_id) REFERENCES Loanees(loanee_id))";
+    private static final String LOANCREATE = "CREATE TABLE Loans(loan_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_id INTEGER, loanee_id INTEGER, check_out INTEGER NOT NULL, check_in INTEGER, FOREIGN KEY(loanable_id) REFERENCES Loanables(loanable_id), FOREIGN KEY(loanee_id) REFERENCES Loanees(loanee_id))";
     public static final int dbId = 0;
 
     private String dbLocation;
@@ -93,9 +93,7 @@ public class SQLiteManager implements DatabaseManager
 
             stmnt.setInt(1, loanable.getLoanableId());
             stmnt.setInt(2, loanee.getLoaneeId());
-            Date now = new Date();
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            stmnt.setString(3, format.format(now));
+            stmnt.setLong(3, new Date().getTime());
 
             return stmnt.executeUpdate() > 0;
         }
@@ -119,9 +117,7 @@ public class SQLiteManager implements DatabaseManager
         {
             PreparedStatement stmnt = connection.prepareStatement("UPDATE Loans SET check_in=? WHERE loanable_id=?");
 
-            Date now = new Date();
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            stmnt.setString(1, format.format(now));
+            stmnt.setLong(1, new Date().getTime());
             stmnt.setInt(2, loanable.getLoanableId());
 
             return stmnt.executeUpdate() > 0;

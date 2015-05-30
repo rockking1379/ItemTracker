@@ -3,6 +3,7 @@ package org.itemtracker.mainclient;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.itemtracker.common.database.DatabaseManager;
+import org.itemtracker.common.database.MSSQLManager;
 import org.itemtracker.common.database.SQLiteManager;
 import org.itemtracker.common.exceptions.ConfigException;
 
@@ -51,6 +52,12 @@ public class MainFrame extends Application
                     case SQLiteManager.dbId:
                     {
                         dbManager = new SQLiteManager(properties.getProperty("DATABASE"));
+                        break;
+                    }
+                    case MSSQLManager.dbId:
+                    {
+                        dbManager = new MSSQLManager(properties.getProperty("DATABASE"), Integer.valueOf(properties.getProperty("DBPORT")), properties.getProperty("DBNAME"),
+                                properties.getProperty("DBUSER"), properties.getProperty("DBPWD"));
                         break;
                     }
                     default:
