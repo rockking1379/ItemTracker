@@ -4,6 +4,7 @@ import org.itemtracker.common.objects.Loan;
 import org.itemtracker.common.objects.Loanable;
 import org.itemtracker.common.objects.Loanee;
 
+import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -15,13 +16,15 @@ public interface DatabaseManager
 {
     /**
      * Makes Connection to Database
+     * @return new Connection to Database
      */
-    void connect();
+    Connection connect();
 
     /**
      * Closes Connection to Database
+     * @param connection Connection to be closed
      */
-    void disconnect();
+    void disconnect(Connection connection);
 
     /**
      * Adds new loan

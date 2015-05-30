@@ -27,7 +27,6 @@ public class SQLiteManager implements DatabaseManager
     public static final int dbId = 0;
 
     private String dbLocation;
-    private Connection connection;
 
     public SQLiteManager(String dbLocation)
     {
@@ -44,21 +43,31 @@ public class SQLiteManager implements DatabaseManager
     }
 
     @Override
-    public void connect()
+    public Connection connect()
     {
         try
         {
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dbLocation);
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:" + dbLocation);
+
+            if(connection != null)
+            {
+                return connection;
+            }
+            else
+            {
+                return null;
+            }
         }
         catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
+            return null;
         }
     }
 
     @Override
-    public void disconnect()
+    public void disconnect(Connection connection)
     {
         if (connection != null)
         {
@@ -71,20 +80,15 @@ public class SQLiteManager implements DatabaseManager
                 //set up logger
                 System.err.println(e.getMessage());
             }
-            finally
-            {
-                connection = null;
-            }
         }
     }
 
     @Override
     public boolean addLoan(Loanable loanable, Loanee loanee)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("INSERT INTO Loans(loanable_id, loanee_id, check_out) VALUES (?,?,?)");
 
             stmnt.setInt(1, loanable.getLoanableId());
@@ -103,17 +107,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public boolean removeLoan(Loanable loanable)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("UPDATE Loans SET check_in=? WHERE loanable_id=?");
 
             Date now = new Date();
@@ -131,22 +134,21 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public List<Loan> getLoans()
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             Statement stmnt = connection.createStatement();
 
             ResultSet loanResultSet = stmnt.executeQuery("SELECT * FROM Loans WHERE check_in IS NULL");
 
-            return processLoanResult(loanResultSet);
+            return processLoanResult(loanResultSet, connection);
         }
         catch (SQLException e)
         {
@@ -156,24 +158,23 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public List<Loan> getLoans(Loanee loanee)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loans WHERE loanee_id=?");
 
             stmnt.setInt(1, loanee.getLoaneeId());
 
             ResultSet loanResultSet = stmnt.executeQuery();
 
-            return processLoanResult(loanResultSet);
+            return processLoanResult(loanResultSet, connection);
         }
         catch (SQLException e)
         {
@@ -183,11 +184,11 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
-    private List<Loan> processLoanResult(ResultSet loanResultSet)
+    private List<Loan> processLoanResult(ResultSet loanResultSet, Connection connection)
     {
         try
         {
@@ -233,10 +234,9 @@ public class SQLiteManager implements DatabaseManager
     @Override
     public boolean addLoanable(Loanable loanable)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("INSERT INTO Loanables(loanable_name, loanable_barcode, loanable_active) VALUES(?,?,1)");
 
             stmnt.setString(1, loanable.getLoanableName());
@@ -252,17 +252,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public boolean removeLoanable(Loanable loanable)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("UPDATE Loanables SET loanable_active=0 WHERE loanable_id=?");
 
             stmnt.setInt(1, loanable.getLoanableId());
@@ -277,17 +276,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public Loanable getLoanable(int loanableId)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanables WHERE loanable_id=?");
 
             stmnt.setInt(1, loanableId);
@@ -309,17 +307,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public Loanable getLoanable(String loanableBarcode)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanables WHERE loanable_barcode=?");
 
             stmnt.setString(1, loanableBarcode);
@@ -341,17 +338,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public List<Loanable> getLoanables()
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             Statement stmnt = connection.createStatement();
 
             ResultSet rs = stmnt.executeQuery("SELECT * FROM Loanables WHERE loanable_active=1");
@@ -373,17 +369,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public boolean addLoanee(Loanee loanee)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("INSERT INTO Loanees(loanee_first_name, loanee_last_name, loanee_email, loanee_barcode, loanee_active) VALUES (?,?,?,?,1)");
 
             stmnt.setString(1, loanee.getFirstName());
@@ -401,17 +396,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public boolean removeLoanee(Loanee loanee)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("UPDATE Loanees SET loanee_active=0 WHERE loanee_id=? OR loanee_barcode=?");
 
             stmnt.setInt(1, loanee.getLoaneeId());
@@ -427,17 +421,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public Loanee getLoanee(int loaneeId)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanees WHERE loanee_id=?");
 
             stmnt.setInt(1, loaneeId);
@@ -461,17 +454,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public Loanee getLoanee(String loaneeBarcode)
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanees WHERE loanee_barcode=?");
 
             stmnt.setString(1, loaneeBarcode);
@@ -495,17 +487,16 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
     @Override
     public List<Loanee> getLoanees()
     {
+        Connection connection = connect();
         try
         {
-            connect();
-
             Statement stmnt = connection.createStatement();
 
             ResultSet rs = stmnt.executeQuery("SELECT * FROM Loanees WHERE loanee_active=1");
@@ -527,7 +518,7 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect();
+            disconnect(connection);
         }
     }
 
@@ -535,11 +526,10 @@ public class SQLiteManager implements DatabaseManager
     public boolean createDatabase()
     {
         boolean retVal = false;
+        Connection connection = connect();
 
         try
         {
-            connect(); //connect to database
-
             Statement stmnt = connection.createStatement(); //create statement
 
             stmnt.execute(LOANDROP); //drop Loans table
@@ -559,7 +549,7 @@ public class SQLiteManager implements DatabaseManager
         }
         finally
         {
-            disconnect(); //disconnect from database regardless of what happened
+            disconnect(connection); //disconnect from database regardless of what happened
         }
 
         return retVal; //return
