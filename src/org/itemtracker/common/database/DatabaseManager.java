@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Interface for accessing any database that implements it
- *
+ * <p>
  * Created by james on 5/29/15.
  */
 public interface DatabaseManager
@@ -25,6 +25,7 @@ public interface DatabaseManager
 
     /**
      * Adds new loan
+     *
      * @param loanable item to be loaned
      * @param loanee person loaing item
      * @return SQL Code execution
@@ -33,6 +34,7 @@ public interface DatabaseManager
 
     /**
      * Removes loan
+     *
      * @param loanable item that was loaned
      * @return SQL Code execution
      */
@@ -41,13 +43,15 @@ public interface DatabaseManager
     /**
      * Gets all active loans
      * <br>
-     *     Active loans are ones with no check_in date
+     * Active loans are ones with no check_in date
+     *
      * @return List of Active Loans
      */
     List<Loan> getLoans();
 
     /**
      * Gets all loans for certain loanee
+     *
      * @param loanee loanee search criteria
      * @return list of loans
      */
@@ -55,6 +59,7 @@ public interface DatabaseManager
 
     /**
      * Adds new loanable
+     *
      * @param loanable item that can be loaned
      * @return SQL Code execution
      */
@@ -62,6 +67,7 @@ public interface DatabaseManager
 
     /**
      * Removes loanable
+     *
      * @param loanable item to be removed
      * @return SQL Code execution
      */
@@ -69,6 +75,7 @@ public interface DatabaseManager
 
     /**
      * Returns specific loanable
+     *
      * @param loanableId loanable_id of Loanable to retrieve
      * @return Loanable item
      */
@@ -76,19 +83,22 @@ public interface DatabaseManager
 
     /**
      * returns specific loanable
-     * @param barcode loanable_barcode of Loanable to retrieve
+     *
+     * @param loanableBarcode loanable_barcode of Loanable to retrieve
      * @return Loanable item
      */
-    Loanable getLoanable(String barcode);
+    Loanable getLoanable(String loanableBarcode);
 
     /**
      * Gets list of all actie Loanable items
+     *
      * @return List of items that can be loaned out
      */
     List<Loanable> getLoanables();
 
     /**
      * Adds new Loanee
+     *
      * @param loanee Loanee to add
      * @return SQL Code execution
      */
@@ -96,6 +106,7 @@ public interface DatabaseManager
 
     /**
      * Removes Loanee
+     *
      * @param loanee Loanee to remove
      * @return SQL Code execution
      */
@@ -103,6 +114,7 @@ public interface DatabaseManager
 
     /**
      * Gets specific Loanee
+     *
      * @param loaneeId loanee_id of Loanee to retrieve
      * @return Loanee
      */
@@ -110,19 +122,22 @@ public interface DatabaseManager
 
     /**
      * Gets specific Loanee
-     * @param loaneeBarcodeId loanee_barcode of Loanee to retrieve
+     *
+     * @param loaneeBarcode loanee_barcode of Loanee to retrieve
      * @return Loanee
      */
-    Loanee getLoanee(String loaneeBarcodeId);
+    Loanee getLoanee(String loaneeBarcode);
 
     /**
      * Gets list of active Loanees
+     *
      * @return List of all active Loanees
      */
     List<Loanee> getLoanees();
 
     /**
      * Sets up database for operation
+     *
      * @return SQL Code execution
      */
     boolean createDatabase();

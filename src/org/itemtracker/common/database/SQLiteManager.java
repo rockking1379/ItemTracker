@@ -8,8 +8,8 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Implements Database Manager
@@ -24,6 +24,7 @@ public class SQLiteManager implements DatabaseManager
     private static final String LOANEECREATE = "CREATE TABLE Loanees(loanee_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanee_first_name VARCHAR(50) NOT NULL, loanee_last_name VARCHAR(50) NOT NULL, loanee_email VARCHAR(75), loanee_barcode VARCHAR(50) NOT NULL, loanee_active BOOLEAN NOT NULL)";
     private static final String LOANABLECREATE = "CREATE TABLE Loanables(loanable_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_name VARCHAR(50) NOT NULL, loanable_barcode VARCHAR(50) NOT NULL, loanable_active BOOLEAN NOT NULL)";
     private static final String LOANCREATE = "CREATE TABLE Loans(loan_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_id INTEGER, loanee_id INTEGER, check_out DATE NOT NULL, check_in DATE, FOREIGN KEY(loanable_id) REFERENCES Loanables(loanable_id), FOREIGN KEY(loanee_id) REFERENCES Loanees(loanee_id))";
+    public static final int dbId = 0;
 
     private String dbLocation;
     private Connection connection;
@@ -35,7 +36,7 @@ public class SQLiteManager implements DatabaseManager
         {
             Class.forName("org.sqlite.JDBC");
         }
-        catch(ClassNotFoundException e)
+        catch (ClassNotFoundException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -94,7 +95,7 @@ public class SQLiteManager implements DatabaseManager
 
             return stmnt.executeUpdate() > 0;
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -121,9 +122,8 @@ public class SQLiteManager implements DatabaseManager
             stmnt.setInt(2, loanable.getLoanableId());
 
             return stmnt.executeUpdate() > 0;
-
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -148,7 +148,7 @@ public class SQLiteManager implements DatabaseManager
 
             return processLoanResult(loanResultSet);
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -175,7 +175,7 @@ public class SQLiteManager implements DatabaseManager
 
             return processLoanResult(loanResultSet);
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -222,7 +222,7 @@ public class SQLiteManager implements DatabaseManager
 
             return result;
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -244,7 +244,7 @@ public class SQLiteManager implements DatabaseManager
 
             return stmnt.executeUpdate() > 0;
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -269,7 +269,7 @@ public class SQLiteManager implements DatabaseManager
 
             return stmnt.executeUpdate() > 0;
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -284,19 +284,97 @@ public class SQLiteManager implements DatabaseManager
     @Override
     public Loanable getLoanable(int loanableId)
     {
-        return null;
+        try
+        {
+            connect();
+
+            PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanables WHERE loanable_id=?");
+
+            stmnt.setInt(1, loanableId);
+
+            ResultSet rs = stmnt.executeQuery();
+
+            Loanable retVal = null;
+            while (rs.next())
+            {
+                retVal = new Loanable(rs.getInt("loanable_id"), rs.getString("loanable_name"), rs.getString("loanable_barcode"));
+            }
+            return retVal;
+        }
+        catch (SQLException e)
+        {
+            //set up logger
+            System.err.println(e.getMessage());
+            return null;
+        }
+        finally
+        {
+            disconnect();
+        }
     }
 
     @Override
-    public Loanable getLoanable(String barcode)
+    public Loanable getLoanable(String loanableBarcode)
     {
-        return null;
+        try
+        {
+            connect();
+
+            PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanables WHERE loanable_barcode=?");
+
+            stmnt.setString(1, loanableBarcode);
+
+            ResultSet rs = stmnt.executeQuery();
+
+            Loanable retVal = null;
+            while (rs.next())
+            {
+                retVal = new Loanable(rs.getInt("loanable_id"), rs.getString("loanable_name"), rs.getString("loanable_barcode"));
+            }
+            return retVal;
+        }
+        catch (SQLException e)
+        {
+            //set up logger
+            System.err.println(e.getMessage());
+            return null;
+        }
+        finally
+        {
+            disconnect();
+        }
     }
 
     @Override
     public List<Loanable> getLoanables()
     {
-        return null;
+        try
+        {
+            connect();
+
+            Statement stmnt = connection.createStatement();
+
+            ResultSet rs = stmnt.executeQuery("SELECT * FROM Loanables WHERE loanable_active=1");
+
+            ArrayList<Loanable> results = new ArrayList<>();
+
+            while (rs.next())
+            {
+                results.add(new Loanable(rs.getInt("loanable_id"), rs.getString("loanable_name"), rs.getString("loanable_barcode")));
+            }
+
+            return results;
+        }
+        catch (SQLException e)
+        {
+            //set up logger
+            System.err.println(e.getMessage());
+            return null;
+        }
+        finally
+        {
+            disconnect();
+        }
     }
 
     @Override
@@ -315,7 +393,7 @@ public class SQLiteManager implements DatabaseManager
 
             return stmnt.executeUpdate() > 0;
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -341,7 +419,7 @@ public class SQLiteManager implements DatabaseManager
 
             return stmnt.executeUpdate() > 0;
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
             //set up logger
             System.err.println(e.getMessage());
@@ -356,19 +434,101 @@ public class SQLiteManager implements DatabaseManager
     @Override
     public Loanee getLoanee(int loaneeId)
     {
-        return null;
+        try
+        {
+            connect();
+
+            PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanees WHERE loanee_id=?");
+
+            stmnt.setInt(1, loaneeId);
+
+            ResultSet rs = stmnt.executeQuery();
+
+            Loanee retVal = null;
+
+            while (rs.next())
+            {
+                retVal = new Loanee(rs.getInt("loanee_id"), rs.getString("loanee_first_name"), rs.getString("loanee_last_name"), rs.getString("loanee_email"), rs.getString("loanee_barcode"));
+            }
+
+            return retVal;
+        }
+        catch (SQLException e)
+        {
+            //set up logger
+            System.err.println(e.getMessage());
+            return null;
+        }
+        finally
+        {
+            disconnect();
+        }
     }
 
     @Override
-    public Loanee getLoanee(String loaneeBarcodeId)
+    public Loanee getLoanee(String loaneeBarcode)
     {
-        return null;
+        try
+        {
+            connect();
+
+            PreparedStatement stmnt = connection.prepareStatement("SELECT * FROM Loanees WHERE loanee_barcode=?");
+
+            stmnt.setString(1, loaneeBarcode);
+
+            ResultSet rs = stmnt.executeQuery();
+
+            Loanee retVal = null;
+
+            while (rs.next())
+            {
+                retVal = new Loanee(rs.getInt("loanee_id"), rs.getString("loanee_first_name"), rs.getString("loanee_last_name"), rs.getString("loanee_email"), rs.getString("loanee_barcode"));
+            }
+
+            return retVal;
+        }
+        catch (SQLException e)
+        {
+            //set up logger
+            System.err.println(e.getMessage());
+            return null;
+        }
+        finally
+        {
+            disconnect();
+        }
     }
 
     @Override
     public List<Loanee> getLoanees()
     {
-        return null;
+        try
+        {
+            connect();
+
+            Statement stmnt = connection.createStatement();
+
+            ResultSet rs = stmnt.executeQuery("SELECT * FROM Loanees WHERE loanee_active=1");
+
+            ArrayList<Loanee> results = new ArrayList<>();
+
+            while (rs.next())
+            {
+                results.add(new Loanee(rs.getInt("loanee_id"), rs.getString("loanee_first_name"), rs.getString("loanee_last_name"), rs.getString("loanee_email"), rs.getString("loanee_barcode")));
+            }
+
+            return results;
+        }
+        catch (SQLException e)
+        {
+            //set up logger
+            System.err.println(e.getMessage());
+            return null;
+        }
+        finally
+        {
+            disconnect();
+        }
     }
 
     @Override
