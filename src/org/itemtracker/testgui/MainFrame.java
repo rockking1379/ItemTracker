@@ -1,4 +1,4 @@
-package org.itemtracker.mainclient;
+package org.itemtracker.testgui;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -30,8 +30,9 @@ public class MainFrame extends Application
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception
+    public void start(Stage stage) throws Exception
     {
+        this.stage = stage;
         //load them properties
         boolean setup = true;
         try
@@ -39,7 +40,7 @@ public class MainFrame extends Application
             properties = new Properties();
             File propFile = new File("./configuration.properties");
 
-            if(propFile.exists())
+            if (propFile.exists())
             {
                 //do stuff to read
                 setup = false;
@@ -47,7 +48,7 @@ public class MainFrame extends Application
                 FileInputStream fStream = new FileInputStream(propFile);
                 properties.load(fStream);
 
-                switch(Integer.valueOf(properties.getProperty("DBID")))
+                switch (Integer.valueOf(properties.getProperty("DBID")))
                 {
                     case SQLiteManager.dbId:
                     {
@@ -69,13 +70,13 @@ public class MainFrame extends Application
                 fStream.close();
             }
         }
-        catch(IOException | ConfigException e)
+        catch (IOException | ConfigException e)
         {
             // set up logger
             System.err.println(e.getMessage());
         }
 
-        if(setup)
+        if (setup)
         {
             //load setup page
         }
