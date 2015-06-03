@@ -6,8 +6,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import org.itemtracker.common.objects.Loan;
-import org.itemtracker.common.objects.Loanable;
-import org.itemtracker.common.objects.Loanee;
 
 import java.net.URL;
 import java.util.List;

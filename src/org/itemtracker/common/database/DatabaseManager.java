@@ -119,6 +119,7 @@ public interface DatabaseManager
 
     /**
      * Changes information about a loanee based on loanee_id
+     *
      * @param loanee Loanee to be updated
      * @return SQL Code exception
      */

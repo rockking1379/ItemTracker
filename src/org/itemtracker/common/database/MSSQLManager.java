@@ -3,6 +3,7 @@ package org.itemtracker.common.database;
 import org.itemtracker.common.objects.Loan;
 import org.itemtracker.common.objects.Loanable;
 import org.itemtracker.common.objects.Loanee;
+import org.itemtracker.common.utils.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
  * <br>
  * Specific for Microsoft SQL Server
  * <br>
- *     <h1>UNTESTED</h1>
+ * <h1>UNTESTED</h1>
  * Created by james on 5/29/15.
  */
 public class MSSQLManager implements DatabaseManager
@@ -46,8 +47,7 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (ClassNotFoundException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
         }
     }
 
@@ -60,8 +60,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -77,8 +77,7 @@ public class MSSQLManager implements DatabaseManager
             }
             catch (SQLException e)
             {
-                //set up logger
-                System.err.println(e.getMessage());
+                Logger.logException(e);
             }
         }
     }
@@ -98,8 +97,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return false;
         }
     }
@@ -118,8 +117,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return false;
         }
     }
@@ -137,8 +136,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -158,8 +157,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -178,8 +177,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return false;
         }
     }
@@ -197,8 +196,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return false;
         }
     }
@@ -223,8 +222,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -249,8 +248,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -275,8 +274,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -297,8 +296,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return false;
         }
     }
@@ -317,8 +316,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return false;
         }
     }
@@ -337,12 +336,11 @@ public class MSSQLManager implements DatabaseManager
             stmnt.setInt(5, loanee.getLoaneeId());
 
             return stmnt.executeUpdate() > 0;
-
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
-            //setup logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return false;
         }
     }
@@ -369,8 +367,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -397,8 +395,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -423,8 +421,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -448,8 +446,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             retVal = false; //shit went south, return false
         }
 
@@ -479,6 +477,8 @@ public class MSSQLManager implements DatabaseManager
 
                 pStmnt = connection.prepareStatement("SELECT * FROM Loanees WHERE loanee_id=? AND Loanees.loanee_active=1");
 
+                pStmnt.setInt(1, loanResultSet.getInt("loanee_id"));
+
                 ResultSet loaneeResultSet = pStmnt.executeQuery();
 
                 while (loaneeResultSet.next())
@@ -493,8 +493,8 @@ public class MSSQLManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
+
             return null;
         }
     }

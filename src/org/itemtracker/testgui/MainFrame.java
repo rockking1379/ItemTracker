@@ -6,12 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.itemtracker.common.database.DatabaseManager;
-import org.itemtracker.common.database.MSSQLManager;
 import org.itemtracker.common.database.SQLiteManager;
-import org.itemtracker.common.exceptions.ConfigException;
+import org.itemtracker.common.utils.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -100,10 +97,9 @@ public class MainFrame extends Application
             MainFrame.stage.setTitle("Main Page");
             MainFrame.stage.show();
         }
-        catch(IOException e)
+        catch (IOException e)
         {
-            //set up logger
-            System.err.println(e.getMessage());
+            Logger.logException(e);
         }
     }
 }

@@ -3,6 +3,7 @@ package org.itemtracker.common.database;
 import org.itemtracker.common.objects.Loan;
 import org.itemtracker.common.objects.Loanable;
 import org.itemtracker.common.objects.Loanee;
+import org.itemtracker.common.utils.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -36,8 +37,7 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (ClassNotFoundException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
         }
     }
 
@@ -59,8 +59,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -76,8 +76,7 @@ public class SQLiteManager implements DatabaseManager
             }
             catch (SQLException e)
             {
-                //set up logger
-                e.printStackTrace();
+                Logger.logException(e);
             }
         }
     }
@@ -98,8 +97,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return false;
         }
         finally
@@ -123,8 +122,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return false;
         }
         finally
@@ -147,8 +146,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -173,8 +172,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -222,8 +221,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
     }
@@ -243,8 +242,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return false;
         }
         finally
@@ -267,8 +266,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return false;
         }
         finally
@@ -298,8 +297,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -329,8 +328,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -360,8 +359,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -387,8 +386,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return false;
         }
         finally
@@ -412,8 +411,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return false;
         }
         finally
@@ -437,12 +436,11 @@ public class SQLiteManager implements DatabaseManager
             stmnt.setInt(5, loanee.getLoaneeId());
 
             return stmnt.executeUpdate() > 0;
-
         }
-        catch(SQLException e)
+        catch (SQLException e)
         {
-            //setup logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return false;
         }
         finally
@@ -474,8 +472,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -507,8 +505,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -538,8 +536,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             return null;
         }
         finally
@@ -569,8 +567,8 @@ public class SQLiteManager implements DatabaseManager
         }
         catch (SQLException e)
         {
-            //set up logger
-            e.printStackTrace();
+            Logger.logException(e);
+
             retVal = false; //shit went south, return false
         }
         finally
