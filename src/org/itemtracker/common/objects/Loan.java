@@ -15,14 +15,16 @@ public class Loan
     private Loanee loanee;
     private long checkOut;
     private long checkIn;
+    private String returnNotes;
 
-    public Loan(int loanId, Loanable loanedItem, Loanee loanee, long checkOut, long checkIn)
+    public Loan(int loanId, Loanable loanedItem, Loanee loanee, long checkOut, long checkIn, String returnNotes)
     {
         this.loanId = loanId;
         this.loanedItem = loanedItem;
         this.loanee = loanee;
         this.checkOut = checkOut;
         this.checkIn = checkIn;
+        this.returnNotes = returnNotes;
     }
 
     public int getLoanId()
@@ -69,5 +71,10 @@ public class Loan
         Date d = new Date(checkIn);
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         return format.format(d);
+    }
+
+    public String getReturnNotes()
+    {
+        return returnNotes;
     }
 }

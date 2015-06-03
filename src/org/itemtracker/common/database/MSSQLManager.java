@@ -6,6 +6,8 @@ import org.itemtracker.common.objects.Loanee;
 import org.itemtracker.common.utils.Logger;
 
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,9 +25,9 @@ public class MSSQLManager implements DatabaseManager
     private static final String LOANDROP = "IF OBJECT_ID('Loans','U') IS NOT NULL DROP TABLE Loans";
     private static final String LOANABLEDROP = "IF OBJECT_ID('Loanables', 'U') IS NOT NULL DROP TABLE Loanables";
     private static final String LOANEEDROP = "IF OBJECT_ID('Loanees', 'U') IS NOT NULL DROP TABLE Loanees";
-    private static final String LOANEECREATE = "CREATE TABLE Loanees(loanee_id INTEGER IDENTITY, loanee_first_name VARCHAR(50) NOT NULL, loanee_last_name VARCHAR(50) NOT NULL, loanee_email VARCHAR(75), loanee_barcode VARCHAR(50) NOT NULL, loanee_active BIT NOT NULL)";
+    private static final String LOANEECREATE = "CREATE TABLE Loanees(loanee_id INTEGER IDENTITY, loanee_first_name VARCHAR(50) NOT NULL, loanee_last_name VARCHAR(50) NOT NULL, loanee_email VARCHAR(75), loanee_barcode VARCHAR(50) NOT NULL, loanee_grad_date DATE, loanee_active BIT NOT NULL)";
     private static final String LOANABLECREATE = "CREATE TABLE Loanables(loanable_id INTEGER IDENTITY, loanable_name VARCHAR(50) NOT NULL, loanable_barcode VARCHAR(50) NOT NULL, loanable_active BIT NOT NULL)";
-    private static final String LOANCREATE = "CREATE TABLE Loans(loan_id INT IDENTITY, loanable_id INT, loanee_id INT, check_out BIGINT NOT NULL, check_in BIGINT, CONSTRAINT fk_loanable_id FOREIGN KEY (loanable_id) REFERENCES Loanables(loanable_id), CONSTRAINT fk_loanee_id FOREIGN KEY (loanee_id) REFERENCES Loanees(loanee_id))";
+    private static final String LOANCREATE = "CREATE TABLE Loans(loan_id INT IDENTITY, loanable_id INT, loanee_id INT, check_out BIGINT NOT NULL, check_in BIGINT, return_reason VARCHAR(250), CONSTRAINT fk_loanable_id FOREIGN KEY (loanable_id) REFERENCES Loanables(loanable_id), CONSTRAINT fk_loanee_id FOREIGN KEY (loanee_id) REFERENCES Loanees(loanee_id))";
     public static final int dbId = 1;
 
     String connectionUrl = "jdbc:sqlserver://";
@@ -454,6 +456,25 @@ public class MSSQLManager implements DatabaseManager
         return retVal; //return
     }
 
+    @Override
+    public int checkGraduates()
+    {
+        try
+        {
+            PreparedStatement stmnt = connection.prepareStatement("UPDATE Loanees SET loanee_active=0 WHERE loanee_grad_date < ?");
+
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            stmnt.setString(1, format.format(new Date()));
+
+            return stmnt.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            Logger.logException(e);
+            return 0;
+        }
+    }
+
     private List<Loan> processLoanResult(ResultSet loanResultSet, Connection connection)
     {
         try
@@ -486,7 +507,7 @@ public class MSSQLManager implements DatabaseManager
                     loanee = new Loanee(loaneeResultSet.getInt("loanee_id"), loaneeResultSet.getString("loanee_first_name"), loaneeResultSet.getString("loanee_last_name"), loaneeResultSet.getString("loanee_barcode"), loaneeResultSet.getString("loanee_email"));
                 }
 
-                result.add(new Loan(loanResultSet.getInt("loan_id"), loanable, loanee, loanResultSet.getLong("check_out"), loanResultSet.getLong("check_in")));
+                result.add(new Loan(loanResultSet.getInt("loan_id"), loanable, loanee, loanResultSet.getLong("check_out"), loanResultSet.getLong("check_in"), loanResultSet.getString("return_notes")));
             }
 
             return result;

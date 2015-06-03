@@ -154,4 +154,13 @@ public interface DatabaseManager
      * @return SQL Code execution
      */
     boolean createDatabase();
+
+    /**
+     * Checks today's date against graduation date of Loanee's
+     * <br>
+     *     if today is after their graduation, their active flag is set to 0
+     *
+     * @return number of graduates marked inactive
+     */
+    int checkGraduates();
 }

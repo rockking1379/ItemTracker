@@ -6,6 +6,8 @@ import org.itemtracker.common.objects.Loanee;
 import org.itemtracker.common.utils.Logger;
 
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,9 +23,9 @@ public class SQLiteManager implements DatabaseManager
     private static final String LOANDROP = "DROP TABLE IF EXISTS Loans";
     private static final String LOANABLEDROP = "DROP TABLE IF EXISTS Loanables";
     private static final String LOANEEDROP = "DROP TABLE IF EXISTS Loanees";
-    private static final String LOANEECREATE = "CREATE TABLE Loanees(loanee_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanee_first_name VARCHAR(50) NOT NULL, loanee_last_name VARCHAR(50) NOT NULL, loanee_email VARCHAR(75), loanee_barcode VARCHAR(50) NOT NULL, loanee_active BOOLEAN NOT NULL)";
+    private static final String LOANEECREATE = "CREATE TABLE Loanees(loanee_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanee_first_name VARCHAR(50) NOT NULL, loanee_last_name VARCHAR(50) NOT NULL, loanee_email VARCHAR(75), loanee_barcode VARCHAR(50) NOT NULL, loanee_grad_date DATE NOT NULL, loanee_active BOOLEAN NOT NULL)";
     private static final String LOANABLECREATE = "CREATE TABLE Loanables(loanable_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_name VARCHAR(50) NOT NULL, loanable_barcode VARCHAR(50) NOT NULL, loanable_active BOOLEAN NOT NULL)";
-    private static final String LOANCREATE = "CREATE TABLE Loans(loan_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_id INTEGER, loanee_id INTEGER, check_out INTEGER NOT NULL, check_in INTEGER, FOREIGN KEY(loanable_id) REFERENCES Loanables(loanable_id), FOREIGN KEY(loanee_id) REFERENCES Loanees(loanee_id))";
+    private static final String LOANCREATE = "CREATE TABLE Loans(loan_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, loanable_id INTEGER, loanee_id INTEGER, check_out INTEGER NOT NULL, check_in INTEGER, return_notes VARCHAR(250), FOREIGN KEY(loanable_id) REFERENCES Loanables(loanable_id), FOREIGN KEY(loanee_id) REFERENCES Loanees(loanee_id))";
     public static final int dbId = 0;
 
     private String dbLocation;
@@ -214,7 +216,7 @@ public class SQLiteManager implements DatabaseManager
                     loanee = new Loanee(loaneeResultSet.getInt("loanee_id"), loaneeResultSet.getString("loanee_first_name"), loaneeResultSet.getString("loanee_last_name"), loaneeResultSet.getString("loanee_barcode"), loaneeResultSet.getString("loanee_email"));
                 }
 
-                result.add(new Loan(loanResultSet.getInt("loan_id"), loanable, loanee, loanResultSet.getLong("check_out"), loanResultSet.getLong("check_in")));
+                result.add(new Loan(loanResultSet.getInt("loan_id"), loanable, loanee, loanResultSet.getLong("check_out"), loanResultSet.getLong("check_in"), loanResultSet.getString("return_notes")));
             }
 
             return result;
@@ -577,5 +579,29 @@ public class SQLiteManager implements DatabaseManager
         }
 
         return retVal; //return
+    }
+
+    @Override
+    public int checkGraduates()
+    {
+        Connection connection = connect();
+        try
+        {
+            PreparedStatement stmnt = connection.prepareStatement("UPDATE Loanees SET loanee_active=0 WHERE loanee_grad_date < ?");
+
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            stmnt.setString(1, format.format(new Date()));
+
+            return stmnt.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            Logger.logException(e);
+            return 0;
+        }
+        finally
+        {
+            disconnect(connection);
+        }
     }
 }

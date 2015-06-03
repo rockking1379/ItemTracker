@@ -9,6 +9,7 @@ import org.itemtracker.common.database.DatabaseManager;
 import org.itemtracker.common.database.SQLiteManager;
 import org.itemtracker.common.utils.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -85,7 +86,20 @@ public class MainFrame extends Application
 //        {
 //            //move to main screen
 //        }
-        dbManager = new SQLiteManager("./database.db");
+
+        File f = new File("./database.db");
+
+        if(!f.exists())
+        {
+            dbManager = new SQLiteManager("./database.db");
+            dbManager.createDatabase();
+        }
+        else
+        {
+            dbManager = new SQLiteManager("./database.db");
+            dbManager.checkGraduates();
+        }
+
         try
         {
             Parent root = FXMLLoader.load(getClass().getResource(
