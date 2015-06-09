@@ -126,6 +126,27 @@ public class MSSQLManager implements DatabaseManager
     }
 
     @Override
+    public boolean removeLoan(Loanable loanable, String returnNotes)
+    {
+        try
+        {
+            PreparedStatement stmnt = connection.prepareStatement("UPDATE Loans SET check_in=?, return_notes=? WHERE loanable_id=?");
+
+            stmnt.setLong(1, new Date().getTime());
+            stmnt.setInt(2, loanable.getLoanableId());
+            stmnt.setString(3, returnNotes);
+
+            return stmnt.executeUpdate() > 0;
+        }
+        catch (SQLException e)
+        {
+            Logger.logException(e);
+
+            return false;
+        }
+    }
+
+    @Override
     public List<Loan> getLoans()
     {
         try
@@ -467,6 +488,56 @@ public class MSSQLManager implements DatabaseManager
             stmnt.setString(1, format.format(new Date()));
 
             return stmnt.executeUpdate();
+        }
+        catch(SQLException e)
+        {
+            Logger.logException(e);
+            return 0;
+        }
+    }
+
+    @Override
+    public int checkStrikes()
+    {
+        try
+        {
+            Statement stmnt = connection.createStatement();
+            int retVal = 0;
+
+            ResultSet rs = stmnt.executeQuery("SELECT COUNT(loan_id) AS c, loanee_id FROM Loans WHERE return_notes IS NULL GROUP BY loanee_id HAVING c >= 3");
+
+            while(rs.next())
+            {
+                PreparedStatement pStmnt = connection.prepareStatement("UPDATE Loanees SET loanee_active=0 WHERE loanee_id=?");
+
+                pStmnt.setInt(1, rs.getInt("loanee_id"));
+
+                retVal += pStmnt.executeUpdate();
+            }
+
+            return retVal;
+        }
+        catch(SQLException e)
+        {
+            Logger.logException(e);
+            return 0;
+        }
+    }
+
+    @Override
+    public int getNumberOf(String type)
+    {
+        try
+        {
+            PreparedStatement stmnt = connection.prepareStatement("SELECT count(loanable_name) AS c FROM Loanables WHERE loanable_name like ?");
+
+            stmnt.setString(1, "%" + type + "%");
+
+            ResultSet rs = stmnt.executeQuery();
+
+            rs.next();
+
+            return rs.getInt("c");
         }
         catch(SQLException e)
         {

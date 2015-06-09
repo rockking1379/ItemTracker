@@ -46,6 +46,15 @@ public interface DatabaseManager
     boolean removeLoan(Loanable loanable);
 
     /**
+     * Removes loan and adds notes for the return reason
+     *
+     * @param loanable item that was loaned
+     * @param returnNotes reason for the return
+     * @return SQL Code execution
+     */
+    boolean removeLoan(Loanable loanable, String returnNotes);
+
+    /**
      * Gets all active loans
      * <br>
      * Active loans are ones with no check_in date
@@ -160,7 +169,22 @@ public interface DatabaseManager
      * <br>
      *     if today is after their graduation, their active flag is set to 0
      *
-     * @return number of graduates marked inactive
+     * @return number of loanees marked inactive
      */
     int checkGraduates();
+
+    /**
+     * Counts the number of strikes a loanee has against them for returning items
+     * <br>
+     *     if to many then we will mark them inactive
+     * @return number of loanees marked inactive
+     */
+    int checkStrikes();
+
+    /**
+     * Will get the number of items based on type
+     * @param type type of laonable, should be in the name
+     * @return number of items matching type
+     */
+    int getNumberOf(String type);
 }

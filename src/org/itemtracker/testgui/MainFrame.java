@@ -91,13 +91,14 @@ public class MainFrame extends Application
 
         if(!f.exists())
         {
-            dbManager = new SQLiteManager("./database.db");
+            dbManager = new SQLiteManager(f.getCanonicalPath());
             dbManager.createDatabase();
         }
         else
         {
-            dbManager = new SQLiteManager("./database.db");
+            dbManager = new SQLiteManager(f.getCanonicalPath());
             dbManager.checkGraduates();
+            dbManager.checkStrikes();
         }
 
         try
